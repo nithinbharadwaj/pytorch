@@ -33,16 +33,15 @@ struct CAFFE2_API ConstantString final : c10::intrusive_ptr_target {
       const ConstantString& v);
 };
 
-// non-mutable list
 template <typename Elem>
 struct C10_EXPORT ConstantList final : c10::intrusive_ptr_target {
  private:
-  const std::vector<Elem> elements_;
+  std::vector<Elem> elements_;
+
  public:
-  ConstantList(std::vector<Elem> elements_)
-  : elements_(std::move(elements_)) {}
-  static c10::intrusive_ptr<ConstantList<Elem>> create(std::vector<Elem> elements_) {
-    return c10::make_intrusive<ConstantList<Elem>>(std::move(elements_));
+  List(std::vector<Elem> elements_) : elements_(std::move(elements_)) {}
+  static c10::intrusive_ptr<List<Elem>> create(std::vector<Elem> elements_) {
+    return c10::make_intrusive<List<Elem>>(std::move(elements_));
   }
   const std::vector<Elem>& elements() const {
     return elements_;
@@ -50,13 +49,25 @@ struct C10_EXPORT ConstantList final : c10::intrusive_ptr_target {
   operator const std::vector<Elem>&() const {
     return elements();
   }
+
+  std::vector<Elem>& elements() {
+    return elements_;
+  }
+  operator std::vector<Elem>&() {
+    return elements();
+  }
+};
+
+struct World {
+  World() : world_id(1) {}
+  int64_t world_id;
 };
 
 struct IValue;
-using Tuple = ConstantList<IValue>;
-using IntList = ConstantList<int64_t>;
-using TensorList = ConstantList<at::Tensor>;
-using DoubleList = ConstantList<double>;
+using Tuple = List<IValue>;
+using IntList = List<int64_t>;
+using TensorList = List<at::Tensor>;
+using DoubleList = List<double>;
 
 // IValue is the generic tagged union used by the interpreter to hold
 // all value types.
@@ -65,10 +76,18 @@ using DoubleList = ConstantList<double>;
 // to mark whether that type is a subtype of c10::intrusive_ptr_target and needs
 // retain/release calls.
 
-#define TORCH_FORALL_TAGS(_)                                             \
-  _(None)                                                                \
-  _(Tensor) _(Double) _(Int) _(Tuple) _(IntList) _(DoubleList) _(String) \
-      _(TensorList) _(Blob)
+#define TORCH_FORALL_TAGS(_) \
+  _(None) \
+  _(Tensor) \
+  _(Double) \
+  _(Int) \
+  _(Tuple) \
+  _(IntList) \
+  _(DoubleList) \
+  _(String) \
+  _(TensorList) \
+  _(Blob) \
+  _(World) \
 
 struct CAFFE2_API IValue final {
   IValue()
@@ -169,6 +188,23 @@ struct CAFFE2_API IValue final {
     AT_ASSERT(isDouble());
     return payload.as_double;
   }
+
+  // World
+  IValue(World w)
+  : tag(Tag::World), is_intrusive_ptr(false) {
+    as_world = w;
+  }
+  bool isWorld() const { return Tag::World == tag; }
+   World toWorld() const {
+    AT_ASSERT(isWorld());
+    return as_world;
+  }
+  TORCH_API std::ostream& formatWorld(std::ostream& out) const {
+    AT_ASSERT(isWorld());
+    out << as_world.world_id;
+    return out;
+  }
+
 
   // Int
   IValue(int64_t i)
@@ -338,6 +374,7 @@ struct CAFFE2_API IValue final {
     int64_t as_int;
     double as_double;
     c10::intrusive_ptr_target* as_intrusive_ptr;
+    World as_world;
   } payload;
   Tag tag;
   bool is_intrusive_ptr;
@@ -368,6 +405,7 @@ DEFINE_TO(bool, toInt)
 DEFINE_TO(std::vector<int64_t>, toIntListRef)
 DEFINE_TO(std::vector<double>, toDoubleListRef)
 DEFINE_TO(std::vector<at::Tensor>, toTensorListRef)
+DEFINE_TO(World, toWorld)
 
 #undef DEFINE_TO
 
