@@ -34,7 +34,7 @@ struct CAFFE2_API ConstantString final : c10::intrusive_ptr_target {
 };
 
 template <typename Elem>
-struct C10_EXPORT ConstantList final : c10::intrusive_ptr_target {
+struct C10_EXPORT List final : c10::intrusive_ptr_target {
  private:
   std::vector<Elem> elements_;
 
@@ -59,7 +59,6 @@ struct C10_EXPORT ConstantList final : c10::intrusive_ptr_target {
 };
 
 struct World {
-  World() : world_id(1) {}
   int64_t world_id;
 };
 
@@ -192,12 +191,12 @@ struct CAFFE2_API IValue final {
   // World
   IValue(World w)
   : tag(Tag::World), is_intrusive_ptr(false) {
-    as_world = w;
+    payload.as_world = w;
   }
   bool isWorld() const { return Tag::World == tag; }
    World toWorld() const {
     AT_ASSERT(isWorld());
-    return as_world;
+    return payload.as_world;
   }
 
   // Int
