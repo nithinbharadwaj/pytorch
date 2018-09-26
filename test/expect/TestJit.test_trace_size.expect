@@ -1,16 +1,16 @@
-graph(%0 : Double(5, 2, 4)) {
-  %1 : int = prim::Constant[value=1]()
-  %2 : int = aten::size(%0, %1)
-  %3 : Long() = prim::NumToTensor(%2)
-  %4 : Long() = prim::Constant[value={2}]()
-  %5 : Long() = aten::mul(%3, %4)
-  %6 : int = prim::TensorToNum(%5)
-  %7 : int = prim::Constant[value=0]()
-  %8 : int = aten::size(%0, %7)
-  %9 : Long() = prim::NumToTensor(%8)
-  %10 : int = prim::TensorToNum(%9)
-  %11 : int = prim::Constant[value=2]()
-  %12 : int[] = prim::ListConstruct(%6, %10, %11)
-  %13 : Double(4, 5, 2) = aten::view(%0, %12)
-  return (%13);
+graph(%1 : Double(5, 2, 4)) {
+  %2 : int = prim::Constant[value=1]()
+  %3 : int = aten::size(%1, %2)
+  %4 : Long() = prim::NumToTensor(%3)
+  %5 : Long() = prim::Constant[value={2}]()
+  %6 : Long() = aten::mul(%4, %5)
+  %7 : int = prim::TensorToNum(%6)
+  %8 : int = prim::Constant[value=0]()
+  %9 : int = aten::size(%1, %8)
+  %10 : Long() = prim::NumToTensor(%9)
+  %11 : int = prim::TensorToNum(%10)
+  %12 : int = prim::Constant[value=2]()
+  %13 : int[] = prim::ListConstruct(%7, %11, %12)
+  %14 : Double(4, 5, 2) = aten::view(%1, %13)
+  return (%14);
 }

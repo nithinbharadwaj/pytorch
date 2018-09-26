@@ -1,7 +1,7 @@
 graph(%x : Dynamic
-      %1 : Dynamic
-      %3 : Dynamic) {
-  %2 : Dynamic = aten::mm(%x, %1)
-  %4 : Double(3, 5) = aten::mm(%2, %3)
-  return (%4);
+      %2 : Dynamic
+      %4 : Dynamic) {
+  %3 : Dynamic = aten::mm(%x, %2)
+  %6 : Double(3, 5) = aten::mm(%3, %4)
+  return (%6);
 }

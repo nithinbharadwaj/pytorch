@@ -1,15 +1,15 @@
 def script(a1, i1):
-  t4 = aten::lt(i1, 3)
-  t5 = prim::TensorToNum(t4)
+  t5 = aten::lt(i1, 3)
+  t6 = prim::TensorToNum(t5)
   a = a1
   i = i1
-  t6 = t5
-  while t6:
+  t8 = t6
+  while t8:
     a2 = aten::mul(a, a)
     i2 = aten::add(i, 1, 1)
-    t13 = aten::lt(i2, 3)
-    t14 = prim::TensorToNum(t13)
-    t6 = t14
+    t15 = aten::lt(i2, 3)
+    t16 = prim::TensorToNum(t15)
+    t8 = t16
     a = a2
     i = i2
   return a
